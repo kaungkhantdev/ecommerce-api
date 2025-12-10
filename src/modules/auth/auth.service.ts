@@ -1,4 +1,8 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { UsersService } from '../users/users.service';
@@ -23,6 +27,8 @@ export class AuthService {
   }
 
   async register(dto: RegisterDto): Promise<AuthResponseDto> {
+    await this.isExitUser(dto.email);
+
     const hashedPassword = await bcrypt.hash(dto.password, this.SALT_ROUNDS);
 
     const user = await this.usersService.createUser({
@@ -63,6 +69,7 @@ export class AuthService {
       user: {
         id: user.id,
         email: user.email,
+        username: user.username,
         firstName: user.firstName,
         lastName: user.lastName,
         role: user.role,
@@ -74,5 +81,10 @@ export class AuthService {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password: _, ...userWithoutPassword } = user;
     return userWithoutPassword;
+  }
+
+  private async isExitUser(email: string): Promise<void> {
+    const exitUser = await this.usersService.getUserByEmail(email);
+    if (exitUser) throw new BadRequestException('User already exists');
   }
 }

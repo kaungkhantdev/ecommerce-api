@@ -33,7 +33,7 @@ export class UsersService {
     // Check if exists
     const existing =
       data.email && (await this.userRepository.findByEmail(data.email));
-    console.log(existing);
+    // console.log(existing);
     if (existing) {
       throw new Error('User already exists');
     }
