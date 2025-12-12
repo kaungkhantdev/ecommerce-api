@@ -1,9 +1,9 @@
 import {
   Controller,
   Get,
-  // Put,
-  // Delete,
-  // Body,
+  Put,
+  Delete,
+  Body,
   Param,
   Query,
   UseGuards,
@@ -22,6 +22,7 @@ import {
 } from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import {
+  UpdateUserDto,
   // UpdateUserDto,
   UserResponseDto,
 } from './dto/user.dto';
@@ -132,31 +133,31 @@ export class UsersController {
     return result;
   }
 
-  // @Put('me')
-  // async updateProfile(
-  //   @CurrentUser('id') userId: string,
-  //   @Body() updateUserDto: UpdateUserDto,
-  // ): Promise<UserResponseDto> {
-  //   const user = await this.usersService.update(userId, updateUserDto);
-  //   const { password, ...result } = user;
-  //   return result;
-  // }
+  @Put('me')
+  async updateProfile(
+    @CurrentUser('id') userId: string,
+    @Body() updateUserDto: UpdateUserDto,
+  ): Promise<UserResponseDto> {
+    const user = await this.usersService.update(userId, updateUserDto);
+    const { password, ...result } = user;
+    return result;
+  }
 
-  // @Put(':id')
-  // @Roles(UserRole.ADMIN)
-  // async update(
-  //   @Param('id') id: string,
-  //   @Body() updateUserDto: UpdateUserDto,
-  // ): Promise<UserResponseDto> {
-  //   const user = await this.usersService.update(id, updateUserDto);
-  //   const { password, ...result } = user;
-  //   return result;
-  // }
+  @Put(':id')
+  @Roles(UserRole.ADMIN)
+  async update(
+    @Param('id') id: string,
+    @Body() updateUserDto: UpdateUserDto,
+  ): Promise<UserResponseDto> {
+    const user = await this.usersService.update(id, updateUserDto);
+    const { password, ...result } = user;
+    return result;
+  }
 
-  // @Delete(':id')
-  // @Roles(UserRole.ADMIN)
-  // async delete(@Param('id') id: string): Promise<{ message: string }> {
-  //   await this.usersService.delete(id);
-  //   return { message: 'User deleted successfully' };
-  // }
+  @Delete(':id')
+  @Roles(UserRole.ADMIN)
+  async delete(@Param('id') id: string): Promise<{ message: string }> {
+    await this.usersService.delete(id);
+    return { message: 'User deleted successfully' };
+  }
 }

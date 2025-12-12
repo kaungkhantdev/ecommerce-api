@@ -4,7 +4,7 @@ import { ConfigModule } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { AuthService } from '../../src/modules/auth/auth.service';
 import { UsersService } from '../../src/modules/users/users.service';
-import { USER_REPOSITORY } from '../../src/modules/users/constants';
+import { USER_REPOSITORY } from '../../src/modules/users/users.constants';
 import { createMockUser } from '../fixtures/users.fixture';
 import * as bcrypt from 'bcrypt';
 
