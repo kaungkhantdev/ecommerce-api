@@ -134,6 +134,21 @@ export class UsersController {
   }
 
   @Put('me')
+  @ApiOperation({
+    summary: 'Update current user profile',
+    description: 'Updates the profile of the authenticated user',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'User profile updated successfully',
+    type: UserResponseDto,
+  })
+  @ApiBadRequestResponse({
+    description: 'Invalid input data',
+  })
+  @ApiUnauthorizedResponse({
+    description: 'User is not authenticated',
+  })
   async updateProfile(
     @CurrentUser('id') userId: string,
     @Body() updateUserDto: UpdateUserDto,
@@ -145,6 +160,30 @@ export class UsersController {
 
   @Put(':id')
   @Roles(UserRole.ADMIN)
+  @ApiOperation({
+    summary: 'Update user by ID (Admin only)',
+    description: 'Updates a specific user. Requires ADMIN role.',
+  })
+  @ApiParam({
+    name: 'id',
+    type: String,
+    description: 'User unique identifier',
+    example: 'uuid-123',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'User updated successfully',
+    type: UserResponseDto,
+  })
+  @ApiBadRequestResponse({
+    description: 'Invalid input data or user not found',
+  })
+  @ApiUnauthorizedResponse({
+    description: 'User is not authenticated',
+  })
+  @ApiForbiddenResponse({
+    description: 'User does not have ADMIN role',
+  })
   async update(
     @Param('id') id: string,
     @Body() updateUserDto: UpdateUserDto,
@@ -156,6 +195,29 @@ export class UsersController {
 
   @Delete(':id')
   @Roles(UserRole.ADMIN)
+  @ApiOperation({
+    summary: 'Delete user (Admin only)',
+    description: 'Deletes a user. Requires ADMIN role.',
+  })
+  @ApiParam({
+    name: 'id',
+    type: String,
+    description: 'User unique identifier',
+    example: 'uuid-123',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'User deleted successfully',
+  })
+  @ApiBadRequestResponse({
+    description: 'User not found',
+  })
+  @ApiUnauthorizedResponse({
+    description: 'User is not authenticated',
+  })
+  @ApiForbiddenResponse({
+    description: 'User does not have ADMIN role',
+  })
   async delete(@Param('id') id: string): Promise<{ message: string }> {
     await this.usersService.delete(id);
     return { message: 'User deleted successfully' };
