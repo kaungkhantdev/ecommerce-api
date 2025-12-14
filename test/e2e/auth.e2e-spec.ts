@@ -7,7 +7,7 @@ import { PassportModule } from '@nestjs/passport';
 import { AuthController } from '../../src/modules/auth/auth.controller';
 import { AuthService } from '../../src/modules/auth/auth.service';
 import { UsersService } from '../../src/modules/users/users.service';
-import { USER_REPOSITORY } from '../../src/modules/users/constants';
+import { USER_REPOSITORY } from '../../src/modules/users/users.constants';
 import { JwtStrategy } from '../../src/modules/auth/strategies/jwt.strategy';
 import { LocalStrategy } from '../../src/modules/auth/strategies/local.strategy';
 import { JwtAuthGuard } from '../../src/common/guards/jwt-auth.guard';
@@ -184,10 +184,10 @@ describe('Auth E2E Tests', () => {
         .send(loginData)
         .expect(201);
 
-      // expect(response.body).toHaveProperty('accessToken');
-      // expect(response.body.user).toHaveProperty('id', mockUser.id);
-      // expect(response.body.user).toHaveProperty('username', mockUser.username);
-      // expect(response.body.user).not.toHaveProperty('password');
+      expect(response.body).toHaveProperty('accessToken');
+      expect(response.body.user).toHaveProperty('id', mockUser.id);
+      expect(response.body.user).toHaveProperty('username', mockUser.username);
+      expect(response.body.user).not.toHaveProperty('password');
     });
 
     it('should fail login with invalid password', async () => {

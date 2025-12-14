@@ -22,7 +22,7 @@ describe('AuthService', () => {
     const mockUsersService = {
       getUserByUsername: jest.fn(),
       getUserByEmail: jest.fn(),
-      createUser: jest.fn(),
+      create: jest.fn(),
       getFindById: jest.fn(),
     };
 
@@ -125,7 +125,7 @@ describe('AuthService', () => {
     it('should create user and return auth response', async () => {
       const hashedPassword = 'hashed-password';
       (bcrypt.hash as jest.Mock).mockResolvedValue(hashedPassword);
-      usersService.createUser.mockResolvedValue({
+      usersService.create.mockResolvedValue({
         ...mockUser,
         email: registerDto.email,
         username: registerDto.username,
@@ -136,7 +136,7 @@ describe('AuthService', () => {
       const result = await service.register(registerDto);
 
       expect(bcrypt.hash).toHaveBeenCalledWith(registerDto.password, 10);
-      expect(usersService.createUser).toHaveBeenCalledWith({
+      expect(usersService.create).toHaveBeenCalledWith({
         ...registerDto,
         password: hashedPassword,
       });
@@ -147,7 +147,7 @@ describe('AuthService', () => {
     it('should hash password with correct salt rounds', async () => {
       const hashedPassword = 'hashed-password';
       (bcrypt.hash as jest.Mock).mockResolvedValue(hashedPassword);
-      usersService.createUser.mockResolvedValue(mockUser);
+      usersService.create.mockResolvedValue(mockUser);
 
       await service.register(registerDto);
 

@@ -1,7 +1,9 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { User } from 'generated/prisma/client';
-import { USER_REPOSITORY } from './constants';
+import { USER_REPOSITORY } from './users.constants';
 import { IUserRepository } from './repositories/users.repository.interface';
+import { UpdateUserDto } from './dto/user.dto';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
@@ -29,7 +31,7 @@ export class UsersService {
     });
   }
 
-  async createUser(data: Partial<User>): Promise<User> {
+  async create(data: Partial<User>): Promise<User> {
     // Check if exists
     const existing =
       data.email && (await this.userRepository.findByEmail(data.email));
@@ -42,5 +44,27 @@ export class UsersService {
 
   async getAll(skip: number, take: number) {
     return this.userRepository.findAll({ skip, take });
+  }
+
+  async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
+    await this.checkUserExit(id);
+
+    const updateData: any = { ...updateUserDto };
+
+    if (updateUserDto.password) {
+      updateData.password = await bcrypt.hash(updateUserDto.password, 10);
+    }
+
+    return this.userRepository.update(id, updateData);
+  }
+
+  async delete(id: string): Promise<User> {
+    await this.checkUserExit(id);
+    return this.userRepository.delete(id);
+  }
+
+  private async checkUserExit(id: string): Promise<void> {
+    const user = await this.getFindById(id);
+    if (!user) throw new BadRequestException('Not found user');
   }
 }

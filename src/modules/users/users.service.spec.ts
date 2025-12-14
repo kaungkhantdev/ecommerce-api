@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsersService } from './users.service';
-import { USER_REPOSITORY } from './constants';
+import { USER_REPOSITORY } from './users.constants';
 import { IUserRepository } from './repositories/users.repository.interface';
 import {
   mockUser,
@@ -136,7 +136,7 @@ describe('UsersService', () => {
     });
   });
 
-  describe('createUser', () => {
+  describe('create', () => {
     const userData = {
       email: 'new@example.com',
       username: 'newuser',
@@ -150,7 +150,7 @@ describe('UsersService', () => {
       userRepository.findByEmail.mockResolvedValue(null);
       userRepository.create.mockResolvedValue(newUser);
 
-      const result = await service.createUser(userData);
+      const result = await service.create(userData);
 
       expect(userRepository.findByEmail).toHaveBeenCalledWith(userData.email);
       expect(userRepository.create).toHaveBeenCalledWith(userData);
@@ -160,7 +160,7 @@ describe('UsersService', () => {
     it('should throw error when email already exists', async () => {
       userRepository.findByEmail.mockResolvedValue(mockUser);
 
-      await expect(service.createUser(userData)).rejects.toThrow(
+      await expect(service.create(userData)).rejects.toThrow(
         'User already exists',
       );
       expect(userRepository.create).not.toHaveBeenCalled();
@@ -171,7 +171,7 @@ describe('UsersService', () => {
       const newUser = createMockUser({ id: 'new-id' });
       userRepository.create.mockResolvedValue(newUser);
 
-      await service.createUser(userDataWithoutEmail);
+      await service.create(userDataWithoutEmail);
 
       expect(userRepository.findByEmail).not.toHaveBeenCalled();
       expect(userRepository.create).toHaveBeenCalled();

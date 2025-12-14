@@ -5,6 +5,10 @@ import configuration from '@/config';
 import { DatabaseModule } from './database/database.module';
 import { ShareModule } from './shared/shared.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { CategoriesModule } from './modules/categories/categories.module';
+import { ProductsModule } from './modules/products/products.module';
+import { CartModule } from './modules/cart/cart.module';
+import { InventoryModule } from './modules/inventory/inventory.module';
 
 @Module({
   imports: [
@@ -16,6 +20,10 @@ import { AuthModule } from './modules/auth/auth.module';
     ShareModule,
     UsersModule,
     AuthModule,
+    CategoriesModule,
+    ProductsModule,
+    CartModule,
+    InventoryModule,
   ],
   controllers: [],
   providers: [],
