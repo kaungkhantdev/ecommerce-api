@@ -13,6 +13,6 @@ import { PRODUCT_REPOSITORY } from './products.constants';
       useClass: ProductRepository,
     },
   ],
-  exports: [ProductsService],
+  exports: [ProductsService, PRODUCT_REPOSITORY],
 })
 export class ProductsModule {}

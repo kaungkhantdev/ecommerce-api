@@ -1,32 +1,62 @@
-
 enum PaymentStatus {
   PENDING
+  PROCESSING
   COMPLETED
   FAILED
   REFUNDED
+  PARTIALLY_REFUNDED
+  CANCELLED
 }
 
 enum PaymentMethod {
   STRIPE
   PAYPAL
   CASH_ON_DELIVERY
+  BANK_TRANSFER
+  WALLET
 }
 
 model Payment {
-  id            String        @id @default(uuid())
-  orderId       String        @unique @map("order_id")
-  amount        Decimal       @db.Decimal(10, 2)
-  method        PaymentMethod
-  status        PaymentStatus @default(PENDING)
-  transactionId String?       @map("transaction_id")
-  metadata      Json?
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt  @map("updated_at")
-
+  id                 String        @id @default(uuid())
+  orderId            String        @map("order_id")
+  
+  // Financial details
+  amount             Decimal       @db.Decimal(10, 2)
+  currency           String        @default("USD") @db.VarChar(3)
+  feeAmount          Decimal?      @db.Decimal(10, 2) @map("fee_amount")
+  netAmount          Decimal?      @db.Decimal(10, 2) @map("net_amount")
+  refundedAmount     Decimal       @default(0) @db.Decimal(10, 2) @map("refunded_amount")
+  
+  // Payment details
+  method             PaymentMethod
+  status             PaymentStatus @default(PENDING)
+  transactionId      String?       @map("transaction_id")
+  
+  // Provider details
+  providerPaymentId  String?       @map("provider_payment_id")
+  providerCustomerId String?       @map("provider_customer_id")
+  failureReason      String?       @db.Text @map("failure_reason")
+  
+  // Security & Audit
+  ipAddress          String?       @db.VarChar(45) @map("ip_address")
+  idempotencyKey     String?       @unique @map("idempotency_key")
+  
+  // Flexible metadata
+  metadata           Json?
+  
+  // Timestamps
+  paidAt             DateTime?     @map("paid_at")
+  refundedAt         DateTime?     @map("refunded_at")
+  createdAt          DateTime      @default(now()) @map("created_at")
+  updatedAt          DateTime      @updatedAt @map("updated_at")
 
   // Relations
   order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
+  @@index([orderId])
   @@index([transactionId])
+  @@index([providerPaymentId])
+  @@index([status])
+  @@index([createdAt])
   @@map("payments")
 }

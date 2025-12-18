@@ -26,7 +26,7 @@ model Order {
   user            User            @relation(fields: [userId], references: [id])
   shippingAddress ShippingAddress @relation(fields: [shippingAddressId], references: [id])
   items           OrderItem[]
-  payment         Payment?
+  payments        Payment[] 
 
   @@index([userId])
   @@index([orderNumber])

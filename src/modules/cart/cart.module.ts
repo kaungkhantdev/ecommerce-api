@@ -21,6 +21,6 @@ import { ProductRepository } from '../products/repositories/product.repository';
       useClass: ProductRepository,
     },
   ],
-  exports: [CartService],
+  exports: [CartService, CART_REPOSITORY],
 })
 export class CartModule {}

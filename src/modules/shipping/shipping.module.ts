@@ -13,6 +13,6 @@ import { ShippingAddressRepository } from './repositories/shipping-address.repos
       useClass: ShippingAddressRepository,
     },
   ],
-  exports: [ShippingService],
+  exports: [ShippingService, SHIPPING_ADDRESS_REPOSITORY],
 })
 export class ShippingModule {}
