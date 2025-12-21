@@ -5,7 +5,11 @@ import { IPaymentRepository } from './repositories/payment.repository.interface'
 import { StripeService } from './stripe.service';
 import { ORDER_REPOSITORY } from '../orders/orders.constants';
 import { IOrderRepository } from '../orders/repositories/order.repository.interface';
-import { PaymentMethod, PaymentStatus, OrderStatus } from 'generated/prisma/client';
+import {
+  PaymentMethod,
+  PaymentStatus,
+  OrderStatus,
+} from 'generated/prisma/client';
 import Stripe from 'stripe';
 import { LineItemBuilderService } from './services/line-item-builder.service';
 import { PaymentValidatorService } from './services/payment-validator.service';
@@ -37,18 +41,22 @@ export class PaymentService {
   /**
    * Creates a Stripe checkout session for an order
    */
-  async createCheckoutSession(
-    userId: string,
-    dto: CreateCheckoutSessionDto,
-  ) {
+  async createCheckoutSession(userId: string, dto: CreateCheckoutSessionDto) {
     const order = await this.helper.findOrderOrFail(userId, dto.orderId);
-    const existingPayment = await this.paymentRepository.findByOrderId(order.id);
+    const existingPayment = await this.paymentRepository.findByOrderId(
+      order.id,
+    );
 
     this.validator.validateNotCompleted(existingPayment);
 
     const session = await this.createStripeSession(order, dto);
 
-    await this.saveOrUpdatePayment(existingPayment, order, session, dto.ipAddress);
+    await this.saveOrUpdatePayment(
+      existingPayment,
+      order,
+      session,
+      dto.ipAddress,
+    );
 
     return {
       sessionId: session.id,
@@ -63,20 +71,18 @@ export class PaymentService {
     switch (event.type) {
       case 'checkout.session.completed':
         await this.webhookHandler.handleCheckoutSessionCompleted(
-          event.data.object as Stripe.Checkout.Session,
+          event.data.object,
         );
         break;
 
       case 'checkout.session.expired':
         await this.webhookHandler.handleCheckoutSessionExpired(
-          event.data.object as Stripe.Checkout.Session,
+          event.data.object,
         );
         break;
 
       case 'payment_intent.payment_failed':
-        await this.webhookHandler.handlePaymentFailed(
-          event.data.object as Stripe.PaymentIntent,
-        );
+        await this.webhookHandler.handlePaymentFailed(event.data.object);
         break;
 
       default:
@@ -124,14 +130,21 @@ export class PaymentService {
       reason,
     );
 
-    await this.updatePaymentAfterRefund(payment, calculation, refund.id, reason);
+    await this.updatePaymentAfterRefund(
+      payment,
+      calculation,
+      refund.id,
+      reason,
+    );
 
     if (calculation.isFullyRefunded) {
       await this.orderRepository.updateStatus(orderId, OrderStatus.REFUNDED);
     }
 
     return {
-      message: this.refundCalculator.createSuccessMessage(calculation.isFullyRefunded),
+      message: this.refundCalculator.createSuccessMessage(
+        calculation.isFullyRefunded,
+      ),
       refundedAmount: calculation.amountToRefund,
       totalRefunded: calculation.totalRefunded,
       refundId: refund.id,
@@ -170,7 +183,12 @@ export class PaymentService {
     const metadata = this.helper.createPaymentMetadata(session.id, session.url);
 
     if (existingPayment) {
-      await this.updateExistingPayment(existingPayment, session, metadata, ipAddress);
+      await this.updateExistingPayment(
+        existingPayment,
+        session,
+        metadata,
+        ipAddress,
+      );
     } else {
       await this.createNewPayment(order, session, metadata, ipAddress);
     }

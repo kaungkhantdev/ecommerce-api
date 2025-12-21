@@ -9,14 +9,14 @@ describe('LocalStrategy', () => {
   let authService: jest.Mocked<AuthService>;
 
   beforeEach(async () => {
-    const mochAuthService = {
+    const mockAuthService = {
       validateCredentials: jest.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         LocalStrategy,
-        { provide: AuthService, useValue: mochAuthService },
+        { provide: AuthService, useValue: mockAuthService },
       ],
     }).compile();
 

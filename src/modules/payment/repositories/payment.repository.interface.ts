@@ -9,7 +9,15 @@ export interface IPaymentRepository extends IRepository<Payment> {
   findByOrderId(orderId: string): Promise<Payment | null>;
   findByTransactionId(transactionId: string): Promise<Payment | null>;
   findByProviderPaymentId(providerPaymentId: string): Promise<Payment | null>;
-  updateStatus(id: string, status: PaymentStatus, paidAt?: Date): Promise<Payment>;
-  updateRefund(id: string, refundedAmount: number, status: PaymentStatus): Promise<Payment>;
+  updateStatus(
+    id: string,
+    status: PaymentStatus,
+    paidAt?: Date,
+  ): Promise<Payment>;
+  updateRefund(
+    id: string,
+    refundedAmount: number,
+    status: PaymentStatus,
+  ): Promise<Payment>;
   findByStatus(status: PaymentStatus): Promise<Payment[]>;
 }

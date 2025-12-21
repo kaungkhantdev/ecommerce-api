@@ -48,7 +48,9 @@ export class PaymentRepository
     })) as Payment | null;
   }
 
-  async findByProviderPaymentId(providerPaymentId: string): Promise<Payment | null> {
+  async findByProviderPaymentId(
+    providerPaymentId: string,
+  ): Promise<Payment | null> {
     return (await this.model.findFirst({
       where: { providerPaymentId },
       include: {
@@ -57,7 +59,11 @@ export class PaymentRepository
     })) as Payment | null;
   }
 
-  async updateStatus(id: string, status: PaymentStatus, paidAt?: Date): Promise<Payment> {
+  async updateStatus(
+    id: string,
+    status: PaymentStatus,
+    paidAt?: Date,
+  ): Promise<Payment> {
     return (await this.model.update({
       where: { id },
       data: {

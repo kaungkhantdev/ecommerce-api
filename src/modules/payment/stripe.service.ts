@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/require-await */
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import Stripe from 'stripe';
@@ -12,7 +13,9 @@ export class StripeService implements OnModuleInit {
     const apiKey = this.configService.get<string>('STRIPE_SECRET_KEY');
 
     if (!apiKey) {
-      throw new Error('STRIPE_SECRET_KEY is not defined in environment variables');
+      throw new Error(
+        'STRIPE_SECRET_KEY is not defined in environment variables',
+      );
     }
 
     this.stripe = new Stripe(apiKey, {
@@ -56,13 +59,21 @@ export class StripeService implements OnModuleInit {
     payload: string | Buffer,
     signature: string,
   ): Promise<Stripe.Event> {
-    const webhookSecret = this.configService.get<string>('STRIPE_WEBHOOK_SECRET');
+    const webhookSecret = this.configService.get<string>(
+      'STRIPE_WEBHOOK_SECRET',
+    );
 
     if (!webhookSecret) {
-      throw new Error('STRIPE_WEBHOOK_SECRET is not defined in environment variables');
+      throw new Error(
+        'STRIPE_WEBHOOK_SECRET is not defined in environment variables',
+      );
     }
 
-    return this.stripe.webhooks.constructEvent(payload, signature, webhookSecret);
+    return this.stripe.webhooks.constructEvent(
+      payload,
+      signature,
+      webhookSecret,
+    );
   }
 
   async refundPayment(

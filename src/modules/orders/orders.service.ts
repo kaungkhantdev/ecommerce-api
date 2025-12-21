@@ -164,9 +164,7 @@ export class OrdersService {
 
     // Only allow updates for pending orders
     if (order.status !== OrderStatus.PENDING) {
-      throw new BadRequestException(
-        'Only pending orders can be modified',
-      );
+      throw new BadRequestException('Only pending orders can be modified');
     }
 
     // Validate shipping address if provided

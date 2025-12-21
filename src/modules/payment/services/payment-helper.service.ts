@@ -55,7 +55,9 @@ export class PaymentHelperService {
     }
 
     if (payment.transactionId) {
-      const session = await this.stripeService.retrieveSession(payment.transactionId);
+      const session = await this.stripeService.retrieveSession(
+        payment.transactionId,
+      );
       return session.payment_intent as string;
     }
 
