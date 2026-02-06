@@ -14,19 +14,19 @@ export class ShippingAddressRepository
   }
 
   async findByUserId(userId: string): Promise<ShippingAddress[]> {
-    return (await this.model.findMany({
+    return await this.model.findMany({
       where: { userId },
       orderBy: [{ isDefault: 'desc' }, { createdAt: 'desc' }],
-    })) as ShippingAddress[];
+    });
   }
 
   async findDefaultByUserId(userId: string): Promise<ShippingAddress | null> {
-    return (await this.model.findFirst({
+    return await this.model.findFirst({
       where: {
         userId,
         isDefault: true,
       },
-    })) as ShippingAddress | null;
+    });
   }
 
   async setAsDefault(id: string, userId: string): Promise<ShippingAddress> {
@@ -37,9 +37,9 @@ export class ShippingAddressRepository
     });
 
     // Then set the specified address as default
-    return (await this.model.update({
+    return await this.model.update({
       where: { id },
       data: { isDefault: true },
-    })) as ShippingAddress;
+    });
   }
 }

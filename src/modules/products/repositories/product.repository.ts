@@ -28,7 +28,7 @@ export class ProductRepository
   }
 
   async findFeatured(limit = 10): Promise<Product[]> {
-    return (await this.model.findMany({
+    return await this.model.findMany({
       where: {
         isActive: true,
         isFeatured: true,
@@ -39,11 +39,11 @@ export class ProductRepository
       },
       take: limit,
       orderBy: { createdAt: 'desc' },
-    })) as Product[];
+    });
   }
 
   async searchByName(query: string, limit = 20) {
-    return (await this.model.findMany({
+    return await this.model.findMany({
       where: {
         isActive: true,
         OR: [
@@ -56,6 +56,6 @@ export class ProductRepository
         images: true,
       },
       take: limit,
-    })) as Product[];
+    });
   }
 }

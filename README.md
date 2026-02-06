@@ -16,13 +16,53 @@ A robust and scalable e-commerce REST API built with NestJS, Prisma, PostgreSQL,
   - Soft delete support
   - Role-based permissions
 
+- **Product Catalog**
+  - Product CRUD with slug-based lookup
+  - Product variants and images
+  - Filtering by category, price range, featured status
+  - Pagination support
+
+- **Categories**
+  - Hierarchical categories (parent-child)
+  - Category CRUD (Admin only)
+
+- **Shopping Cart**
+  - Add, update, remove items
+  - Clear entire cart
+  - Automatic price tracking
+
+- **Order Management**
+  - Create orders from cart
+  - Order status tracking (PENDING, PROCESSING, SHIPPED, DELIVERED, CANCELLED, REFUNDED)
+  - Order lookup by ID or order number
+  - Cancel orders
+
+- **Payment Processing**
+  - Stripe checkout integration
+  - Webhook handling for payment events
+  - Full and partial refunds
+  - Payment validation and idempotency
+
+- **Reviews & Ratings**
+  - Product reviews with ratings
+  - One review per user per product
+  - Verified purchase tracking
+
+- **Shipping Addresses**
+  - Multiple addresses per user
+  - Default address support
+
+- **Inventory**
+  - Stock quantity tracking
+  - Reserved stock management
+
 - **Architecture**
   - Clean architecture with repository pattern
   - Generic repository with CRUD operations
   - Soft-deletable repository
   - Custom decorators and guards
   - Global exception filters
-  - Response transformation interceptors
+  - Standardized response transformation interceptors
 
 - **API Documentation**
   - Swagger/OpenAPI documentation
@@ -39,6 +79,7 @@ A robust and scalable e-commerce REST API built with NestJS, Prisma, PostgreSQL,
 - **Framework**: NestJS 11
 - **Database**: PostgreSQL with Prisma ORM 7
 - **Authentication**: Passport.js with JWT
+- **Payments**: Stripe
 - **Validation**: class-validator & class-transformer
 - **Documentation**: Swagger/OpenAPI
 - **Testing**: Jest & Supertest
@@ -77,6 +118,10 @@ DATABASE_URL="postgresql://user:password@localhost:5432/ecommerce?schema=public"
 JWT_SECRET="your-super-secret-jwt-key-change-this"
 JWT_EXPIRATION="7d"
 
+# Stripe
+STRIPE_SECRET_KEY="sk_test_..."
+STRIPE_WEBHOOK_SECRET="whsec_..."
+
 # App
 PORT=3000
 NODE_ENV="development"
@@ -84,7 +129,7 @@ NODE_ENV="development"
 
 4. Run Prisma migrations:
 ```bash
-npm run prisma:migrate:dev
+npm run prisma:migrate:deploy
 ```
 
 5. Generate Prisma client:
@@ -110,22 +155,29 @@ npm run start:prod
 npm run start:debug
 ```
 
+### Docker
+
+Build and run with Docker directly:
+```bash
+# Build the image
+docker build --build-arg DATABASE_URL="postgresql://placeholder" -t ecommerce-api .
+
+# Run the container
+docker run -p 3000:3000 -e DATABASE_URL="postgresql://user:password@host:5432/dbname" ecommerce-api
+```
+
+Or use Docker Compose (starts both the API and PostgreSQL):
+```bash
+docker compose up --build
+```
+
 The API will be available at:
 - Application: `http://localhost:3000`
 - Swagger Documentation: `http://localhost:3000/api`
 
 ## API Endpoints
 
-### Authentication
-- `POST /auth/register` - Register a new user
-- `POST /auth/login` - Login and get JWT token
-
-### Users
-- `GET /users` - Get all users (Admin only)
-- `GET /users/:id` - Get user by ID
-- `PUT /users/:id` - Update user
-- `DELETE /users/:id` - Soft delete user
-
+All endpoints are prefixed with `/api/v1`.
 For detailed API documentation, visit the Swagger UI at `/api` when the application is running.
 
 ## Testing
@@ -155,22 +207,37 @@ npm run test:cov
 ### Repository Pattern
 The project uses a generic repository pattern for database operations:
 
-- **BaseRepository**: Base CRUD operations
-- **ReadRepository**: Read-only operations
+- **ReadRepository**: Read-only operations (find, findAll, count)
 - **WriteRepository**: Create, update, delete operations
 - **SoftDeletableRepository**: Soft delete support
-
-### Authentication Flow
-1. User registers or logs in
-2. Server validates credentials and generates JWT token
-3. Client includes JWT token in Authorization header
-4. JwtAuthGuard validates token on protected routes
-5. RoleGuard checks user permissions
 
 ### Custom Decorators
 - `@Public()` - Mark routes as public (bypass JWT guard)
 - `@Roles(UserRole.ADMIN)` - Protect routes by role
 - `@CurrentUser()` - Get current user from request
+
+### Response Format
+All responses are wrapped in a standardized format:
+```json
+{
+  "success": true,
+  "data": { },
+  "meta": {
+    "statusCode": 200,
+    "timestamp": "2025-01-01T00:00:00.000Z",
+    "path": "/api/v1/products",
+    "requestId": "uuid",
+    "pagination": {
+      "page": 1,
+      "limit": 10,
+      "total": 100,
+      "totalPages": 10,
+      "hasNext": true,
+      "hasPrev": false
+    }
+  }
+}
+```
 
 ## Development
 
@@ -187,13 +254,19 @@ npm run lint
 ### Database Commands
 ```bash
 # Create migration
-npx prisma migrate dev --name migration_name
+npm run prisma:migrate:dev
 
-# Reset database
-npx prisma migrate reset
+# Deploy migrations
+npm run prisma:migrate:deploy
 
 # Open Prisma Studio
-npx prisma studio
+npm run prisma:studio
+
+# Validate schema
+npm run prisma:validate
+
+# Format schema
+npm run prisma:format
 ```
 
 ## Environment Variables
@@ -203,6 +276,8 @@ npx prisma studio
 | `DATABASE_URL` | PostgreSQL connection string | - |
 | `JWT_SECRET` | Secret key for JWT signing | - |
 | `JWT_EXPIRATION` | JWT token expiration time | 7d |
+| `STRIPE_SECRET_KEY` | Stripe API secret key | - |
+| `STRIPE_WEBHOOK_SECRET` | Stripe webhook signing secret | - |
 | `PORT` | Application port | 3000 |
 | `NODE_ENV` | Environment mode | development |
 
@@ -215,6 +290,7 @@ npx prisma studio
 - SQL injection protection via Prisma
 - Global exception handling
 - Request payload whitelisting
+- Stripe webhook signature verification
 
 ## Contributing
 
@@ -223,6 +299,10 @@ npx prisma studio
 3. Commit your changes (`git commit -m 'Add some amazing feature'`)
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
+
+## Author
+
+[kaungkhantdev](https://github.com/kaungkhantdev)
 
 ## License
 
@@ -233,6 +313,7 @@ This project is [UNLICENSED](LICENSE).
 - [NestJS Documentation](https://docs.nestjs.com)
 - [Prisma Documentation](https://www.prisma.io/docs)
 - [Passport.js Documentation](http://www.passportjs.org)
+- [Stripe Documentation](https://docs.stripe.com)
 - [JWT Documentation](https://jwt.io)
 
 ## Support

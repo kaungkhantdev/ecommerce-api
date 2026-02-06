@@ -1,15 +1,24 @@
-/* eslint-disable @typescript-eslint/require-await */
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import Stripe from 'stripe';
 
+export interface CreateCheckoutSessionParams {
+  orderId: string;
+  orderNumber: string;
+  amount: number;
+  currency: string;
+  customerEmail: string;
+  lineItems: Stripe.Checkout.SessionCreateParams.LineItem[];
+  successUrl: string;
+  cancelUrl: string;
+  metadata?: Record<string, string>;
+}
+
 @Injectable()
-export class StripeService implements OnModuleInit {
-  private stripe: Stripe;
+export class StripeService {
+  private readonly stripe: Stripe;
 
-  constructor(private configService: ConfigService) {}
-
-  onModuleInit() {
+  constructor(private configService: ConfigService) {
     const apiKey = this.configService.get<string>('STRIPE_SECRET_KEY');
 
     if (!apiKey) {
@@ -18,23 +27,13 @@ export class StripeService implements OnModuleInit {
       );
     }
 
-    this.stripe = new Stripe(apiKey, {
-      apiVersion: '2025-12-15.clover',
-    });
+    this.stripe = new Stripe(apiKey);
   }
 
-  async createCheckoutSession(params: {
-    orderId: string;
-    orderNumber: string;
-    amount: number;
-    currency: string;
-    customerEmail: string;
-    lineItems: Stripe.Checkout.SessionCreateParams.LineItem[];
-    successUrl: string;
-    cancelUrl: string;
-    metadata?: Record<string, string>;
-  }): Promise<Stripe.Checkout.Session> {
-    const session = await this.stripe.checkout.sessions.create({
+  async createCheckoutSession(
+    params: CreateCheckoutSessionParams,
+  ): Promise<Stripe.Checkout.Session> {
+    return this.stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       mode: 'payment',
       customer_email: params.customerEmail,
@@ -47,18 +46,16 @@ export class StripeService implements OnModuleInit {
         ...params.metadata,
       },
     });
-
-    return session;
   }
 
   async retrieveSession(sessionId: string): Promise<Stripe.Checkout.Session> {
-    return await this.stripe.checkout.sessions.retrieve(sessionId);
+    return this.stripe.checkout.sessions.retrieve(sessionId);
   }
 
-  async constructWebhookEvent(
+  constructWebhookEvent(
     payload: string | Buffer,
     signature: string,
-  ): Promise<Stripe.Event> {
+  ): Stripe.Event {
     const webhookSecret = this.configService.get<string>(
       'STRIPE_WEBHOOK_SECRET',
     );
@@ -83,15 +80,11 @@ export class StripeService implements OnModuleInit {
   ): Promise<Stripe.Refund> {
     const refundParams: Stripe.RefundCreateParams = {
       payment_intent: paymentIntentId,
-      ...(amount && { amount }),
-      ...(reason && { reason: 'requested_by_customer' }),
+      ...(amount !== undefined && { amount }),
+      ...(reason && { reason: 'requested_by_customer' as const }),
       ...(reason && { metadata: { reason } }),
     };
 
-    return await this.stripe.refunds.create(refundParams);
-  }
-
-  getStripeInstance(): Stripe {
-    return this.stripe;
+    return this.stripe.refunds.create(refundParams);
   }
 }

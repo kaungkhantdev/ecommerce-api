@@ -14,7 +14,7 @@ export class PaymentRepository
   }
 
   async findByOrderId(orderId: string): Promise<Payment | null> {
-    return (await this.model.findUnique({
+    return await this.model.findUnique({
       where: { orderId },
       include: {
         order: {
@@ -36,27 +36,27 @@ export class PaymentRepository
           },
         },
       },
-    })) as Payment | null;
+    });
   }
 
   async findByTransactionId(transactionId: string): Promise<Payment | null> {
-    return (await this.model.findFirst({
+    return await this.model.findFirst({
       where: { transactionId },
       include: {
         order: true,
       },
-    })) as Payment | null;
+    });
   }
 
   async findByProviderPaymentId(
     providerPaymentId: string,
   ): Promise<Payment | null> {
-    return (await this.model.findFirst({
+    return await this.model.findFirst({
       where: { providerPaymentId },
       include: {
         order: true,
       },
-    })) as Payment | null;
+    });
   }
 
   async updateStatus(
@@ -64,7 +64,7 @@ export class PaymentRepository
     status: PaymentStatus,
     paidAt?: Date,
   ): Promise<Payment> {
-    return (await this.model.update({
+    return await this.model.update({
       where: { id },
       data: {
         status,
@@ -73,7 +73,7 @@ export class PaymentRepository
       include: {
         order: true,
       },
-    })) as Payment;
+    });
   }
 
   async updateRefund(
@@ -81,7 +81,7 @@ export class PaymentRepository
     refundedAmount: number,
     status: PaymentStatus,
   ): Promise<Payment> {
-    return (await this.model.update({
+    return await this.model.update({
       where: { id },
       data: {
         refundedAmount,
@@ -91,11 +91,11 @@ export class PaymentRepository
       include: {
         order: true,
       },
-    })) as Payment;
+    });
   }
 
   async findByStatus(status: PaymentStatus): Promise<Payment[]> {
-    return (await this.model.findMany({
+    return await this.model.findMany({
       where: { status },
       include: {
         order: {
@@ -112,6 +112,6 @@ export class PaymentRepository
         },
       },
       orderBy: { createdAt: 'desc' },
-    })) as Payment[];
+    });
   }
 }
