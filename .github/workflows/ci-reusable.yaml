@@ -8,6 +8,10 @@ on:
       POSTGRES_PASSWORD:
         required: true
 
+env:
+    DATABASE_URL: "postgresql://${{ secrets.POSTGRES_USER }}:${{ secrets.POSTGRES_PASSWORD }}@localhost:5432/test"
+    STRIPE_SECRET_KEY: "dummy-key"
+
 jobs:
   lint:
     name: Lint
@@ -44,8 +48,6 @@ jobs:
           --health-interval=10s
           --health-timeout=5s
           --health-retries=3
-    env:
-      DATABASE_URL: "postgresql://${{ secrets.POSTGRES_USER }}:${{ secrets.POSTGRES_PASSWORD }}@localhost:5432/test"
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -95,8 +97,6 @@ jobs:
           --health-interval=10s
           --health-timeout=5s
           --health-retries=3
-    env:
-      DATABASE_URL: "postgresql://${{ secrets.POSTGRES_USER }}:${{ secrets.POSTGRES_PASSWORD }}@localhost:5432/test"
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -142,5 +142,7 @@ jobs:
           context: .
           push: false
           tags: ecommerce-api:ci-test
+          build-args: |
+            DATABASE_URL=${{ env.DATABASE_URL }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
