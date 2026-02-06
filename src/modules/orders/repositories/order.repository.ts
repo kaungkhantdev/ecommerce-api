@@ -52,7 +52,10 @@ export class OrderRepository
     })) as Order | null;
   }
 
-  async findByUserIdAndId(userId: string, orderId: string): Promise<Order | null> {
+  async findByUserIdAndId(
+    userId: string,
+    orderId: string,
+  ): Promise<Order | null> {
     return (await this.model.findFirst({
       where: {
         id: orderId,

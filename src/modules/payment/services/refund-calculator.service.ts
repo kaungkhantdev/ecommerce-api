@@ -58,7 +58,7 @@ export class RefundCalculatorService {
     alreadyRefunded: number,
   ): number {
     // If no amount specified, refund remaining amount
-    return requestedAmount ?? (totalAmount - alreadyRefunded);
+    return requestedAmount ?? totalAmount - alreadyRefunded;
   }
 
   /**

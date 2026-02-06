@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   Controller,
   Get,
@@ -60,7 +61,7 @@ export class UsersController {
   ): Promise<UserResponseDto> {
     const user = await this.usersService.getFindById(userId);
     if (!user) throw new BadRequestException('Not found user');
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
     const { password, ...result } = user;
     return result;
   }
@@ -128,7 +129,7 @@ export class UsersController {
   async findOne(@Param('id') id: string): Promise<UserResponseDto> {
     const user = await this.usersService.getFindById(id);
     if (!user) throw new BadRequestException('Not found user');
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
     const { password, ...result } = user;
     return result;
   }

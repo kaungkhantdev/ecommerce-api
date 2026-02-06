@@ -1,12 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Put,
-  Patch,
-  Body,
-  Param,
-} from '@nestjs/common';
+import { Controller, Get, Post, Put, Patch, Body, Param } from '@nestjs/common';
 import {
   ApiTags,
   ApiBearerAuth,
@@ -35,7 +27,10 @@ export class OrdersController {
     description: 'Order created successfully',
   })
   @ApiResponse({ status: 400, description: 'Invalid input data' })
-  @ApiResponse({ status: 404, description: 'Shipping address or product not found' })
+  @ApiResponse({
+    status: 404,
+    description: 'Shipping address or product not found',
+  })
   async create(
     @CurrentUser('id') userId: string,
     @Body() createOrderDto: CreateOrderDto,
@@ -87,7 +82,10 @@ export class OrdersController {
     status: 200,
     description: 'Order updated successfully',
   })
-  @ApiResponse({ status: 400, description: 'Invalid input data or order cannot be modified' })
+  @ApiResponse({
+    status: 400,
+    description: 'Invalid input data or order cannot be modified',
+  })
   @ApiResponse({ status: 404, description: 'Order not found' })
   async update(
     @Param('id') id: string,
