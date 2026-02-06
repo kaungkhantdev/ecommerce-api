@@ -111,11 +111,7 @@ export class PaymentController {
       throw new Error('No payload received');
     }
 
-    // Construct and verify the event
-    const event = await this.stripeService.constructWebhookEvent(
-      payload,
-      signature,
-    );
+    const event = this.stripeService.constructWebhookEvent(payload, signature);
 
     // Handle the event
     return this.paymentService.handleWebhookEvent(event);

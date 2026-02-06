@@ -20,7 +20,7 @@ export class ReviewRepository
     skip?: number,
     take?: number,
   ): Promise<Review[]> {
-    return (await this.model.findMany({
+    return await this.model.findMany({
       where: { productId },
       include: {
         user: {
@@ -41,6 +41,6 @@ export class ReviewRepository
       orderBy: { createdAt: 'desc' },
       skip: skip ?? 0,
       take: take ?? 10,
-    })) as Review[];
+    });
   }
 }

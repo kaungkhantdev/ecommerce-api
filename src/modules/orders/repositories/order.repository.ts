@@ -14,7 +14,7 @@ export class OrderRepository
   }
 
   async findByUserId(userId: string): Promise<Order[]> {
-    return (await this.model.findMany({
+    return await this.model.findMany({
       where: { userId },
       include: {
         items: {
@@ -26,11 +26,11 @@ export class OrderRepository
         payment: true,
       },
       orderBy: { createdAt: 'desc' },
-    })) as Order[];
+    });
   }
 
   async findByOrderNumber(orderNumber: string): Promise<Order | null> {
-    return (await this.model.findUnique({
+    return await this.model.findUnique({
       where: { orderNumber },
       include: {
         items: {
@@ -49,14 +49,14 @@ export class OrderRepository
           },
         },
       },
-    })) as Order | null;
+    });
   }
 
   async findByUserIdAndId(
     userId: string,
     orderId: string,
   ): Promise<Order | null> {
-    return (await this.model.findFirst({
+    return await this.model.findFirst({
       where: {
         id: orderId,
         userId,
@@ -70,11 +70,11 @@ export class OrderRepository
         shippingAddress: true,
         payment: true,
       },
-    })) as Order | null;
+    });
   }
 
   async updateStatus(id: string, status: OrderStatus): Promise<Order> {
-    return (await this.model.update({
+    return await this.model.update({
       where: { id },
       data: { status },
       include: {
@@ -86,11 +86,11 @@ export class OrderRepository
         shippingAddress: true,
         payment: true,
       },
-    })) as Order;
+    });
   }
 
   async findByStatus(status: OrderStatus): Promise<Order[]> {
-    return (await this.model.findMany({
+    return await this.model.findMany({
       where: { status },
       include: {
         items: {
@@ -110,6 +110,6 @@ export class OrderRepository
         },
       },
       orderBy: { createdAt: 'desc' },
-    })) as Order[];
+    });
   }
 }
