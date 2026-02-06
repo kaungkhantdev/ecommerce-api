@@ -160,7 +160,7 @@ npm run start:debug
 Build and run with Docker directly:
 ```bash
 # Build the image
-docker build  -t ecommerce-api .
+docker build --build-arg DATABASE_URL="postgresql://placeholder" -t ecommerce-api .
 
 # Run the container
 docker run -p 3000:3000 -e DATABASE_URL="postgresql://user:password@host:5432/dbname" ecommerce-api

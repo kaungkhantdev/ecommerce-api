@@ -3,14 +3,12 @@ name: Reusable CI Pipeline
 on:
   workflow_call:
     secrets:
-      POSTGRES_USER:
-        required: true
-      POSTGRES_PASSWORD:
+      DATABASE_URL:
         required: true
 
 env:
-    DATABASE_URL: "postgresql://${{ secrets.POSTGRES_USER }}:${{ secrets.POSTGRES_PASSWORD }}@localhost:5432/test"
-    STRIPE_SECRET_KEY: "dummy-key"
+  DATABASE_URL: ${{ secrets.DATABASE_URL }}
+  STRIPE_SECRET_KEY: "dummy-key"
 
 jobs:
   lint:
@@ -38,8 +36,8 @@ jobs:
       postgres:
         image: postgres:17
         env:
-          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
-          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
           POSTGRES_DB: test
         ports:
           - 5432:5432
@@ -87,8 +85,8 @@ jobs:
       postgres:
         image: postgres:17
         env:
-          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
-          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
           POSTGRES_DB: test
         ports:
           - 5432:5432
