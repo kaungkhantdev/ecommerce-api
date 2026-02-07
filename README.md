@@ -163,7 +163,7 @@ Build and run with Docker directly:
 docker build --build-arg DATABASE_URL="postgresql://placeholder" -t ecommerce-api .
 
 # Run the container
-docker run -p 3000:3000 -e DATABASE_URL="postgresql://user:password@host:5432/dbname" ecommerce-api
+docker run -p 3000:3000 --env-file .env ecommerce-api
 ```
 
 Or use Docker Compose (starts both the API and PostgreSQL):
