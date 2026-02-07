@@ -16,6 +16,8 @@ RUN npm run build && npm prune --omit=dev
 
 FROM node:22-alpine AS runner
 
+RUN npm install -g npm@11.9.0
+
 COPY --from=builder --chown=node:node /usr/local/app/prisma /prisma
 COPY --from=builder --chown=node:node /usr/local/app/generated /generated
 COPY --from=builder --chown=node:node /usr/local/app/dist /dist
