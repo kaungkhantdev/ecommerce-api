@@ -47,6 +47,8 @@ jobs:
   docker-scan:
     name: Docker Image Security Scan
     runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -58,6 +60,8 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
+          build-args: |
+            DATABASE_URL=${{ env.DATABASE_URL }}
           push: false
           load: true
           tags: ecommerce-api:scan
