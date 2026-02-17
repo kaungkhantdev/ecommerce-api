@@ -5,7 +5,8 @@ services:
       dockerfile: Dockerfile
       args:
         DATABASE_URL: postgresql://nestuser:1234@db:5432/test
-    command: ["run", "npm run prisma:migrate:deploy"]
+    entrypoint: ["sh", "-c", "npm install --include=dev && npm run prisma:migrate:deploy"]
+    command: []
     environment:
       - DATABASE_URL=postgresql://nestuser:1234@db:5432/test
     depends_on:
@@ -21,9 +22,8 @@ services:
     command: ["run", "start:prod"]
     ports:
       - "3000:3000"
-    environment:
-      - NODE_ENV=production
-      - DATABASE_URL=postgresql://nestuser:1234@db:5432/test
+    env_file:
+      - .env
     depends_on:
       migrate:
         condition: service_completed_successfully
