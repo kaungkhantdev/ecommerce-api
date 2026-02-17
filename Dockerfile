@@ -18,10 +18,13 @@ FROM node:22-alpine AS runner
 
 RUN npm install -g npm@11.9.0
 
-COPY --from=builder --chown=node:node /usr/local/app/prisma /prisma
-COPY --from=builder --chown=node:node /usr/local/app/generated /generated
-COPY --from=builder --chown=node:node /usr/local/app/dist /dist
-COPY --from=builder --chown=node:node /usr/local/app/node_modules /node_modules
+WORKDIR /usr/local/app
+
+COPY --from=builder --chown=node:node /usr/local/app/prisma ./prisma
+COPY --from=builder --chown=node:node /usr/local/app/prisma.config.ts ./prisma.config.ts
+COPY --from=builder --chown=node:node /usr/local/app/generated ./generated
+COPY --from=builder --chown=node:node /usr/local/app/dist ./dist
+COPY --from=builder --chown=node:node /usr/local/app/node_modules ./node_modules
 COPY --from=builder --chown=node:node /usr/local/app/package*.json ./
 
 USER node
