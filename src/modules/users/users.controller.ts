@@ -9,6 +9,7 @@ import {
   Query,
   UseGuards,
   BadRequestException,
+  ParseIntPipe,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -96,7 +97,10 @@ export class UsersController {
   @ApiForbiddenResponse({
     description: 'User does not have ADMIN role',
   })
-  async findAll(@Query('page') page = 1, @Query('limit') limit = 10) {
+  async findAll(
+    @Query('page', ParseIntPipe) page = 1,
+    @Query('limit', ParseIntPipe) limit = 10,
+  ) {
     return await this.usersService.getAll(page, limit);
   }
 
